@@ -21,7 +21,7 @@ export default function RaceRow({ race, status }) {
           <FlagImage
             code={countryCode(race.Circuit.Location.country)}
             label={race.Circuit.Location.country}
-            size="sm"
+            size="md"
           />
           {race.raceName}
         </p>

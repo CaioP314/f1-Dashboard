@@ -1,5 +1,5 @@
 Projeto feito com **Next.js (App Router) + React + Tailwind CSS**, consumindo
-dados da [Jolpica F1 API](https://jolpi.ca).
+dados da [Jolpica F1 API](https://github.com/jolpica/jolpica-f1).
 
 ## Como rodar
 

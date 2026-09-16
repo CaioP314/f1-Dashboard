@@ -36,7 +36,7 @@ export default async function DriverPage({ params }) {
             <FlagImage
               code={nationalityCode(driver.nationality)}
               label={driver.nationality}
-              size="lg"
+              size="md"
             />
             {driver.givenName} {driver.familyName}
           </h1>
@@ -106,7 +106,7 @@ export default async function DriverPage({ params }) {
                       <td className="px-3 py-3 text-right">
                         <NumBadge
                           value={result.position}
-                          size="sm"
+                          size="md"
                           tone={PODIUM_TONE[result.position] ?? "plain"}
                         />
                       </td>

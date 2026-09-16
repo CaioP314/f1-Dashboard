@@ -1,16 +1,23 @@
 import Image from "next/image";
 
 const SIZES = {
-  sm: { px: 20, cdnW: 40,  w: "w-5"  },
-  md: { px: 28, cdnW: 40,  w: "w-7"  },
-  lg: { px: 40, cdnW: 80,  w: "w-10" },
+  sm: { px: 28, cdnW: 40, w: "w-7", h: "h-5" },
+  md: { px: 28, cdnW: 40, w: "w-7", h: "h-5" },
+  lg: { px: 28, cdnW: 40, w: "w-7", h: "h-5" },
 };
 
 export default function FlagImage({ code, label = "", size = "md", className = "" }) {
-  const { px, cdnW, w } = SIZES[size] ?? SIZES.md;
+  const { px, cdnW, w, h } = SIZES[size] ?? SIZES.md;
 
   if (!code) {
-    return <span className={`inline-block ${w} ${className}`} aria-label={label}>🏁</span>;
+    return (
+      <span
+        className={`inline-flex ${w} ${h} shrink-0 items-center justify-center ${className}`}
+        aria-label={label}
+      >
+        🏁
+      </span>
+    );
   }
 
   return (
@@ -19,7 +26,7 @@ export default function FlagImage({ code, label = "", size = "md", className = "
       width={px}
       height={Math.round(px * 0.67)}                       
       alt={label}
-      className={`inline-block shrink-0 rounded-[2px] object-cover shadow-sm ${w} ${className}`}
+      className={`inline-block ${w} ${h} shrink-0 rounded-xs object-cover shadow-sm ${className}`}
       unoptimized
     />
   );

@@ -37,7 +37,7 @@ export default function ResultsTable({ results }) {
                   <FlagImage
                     code={nationalityCode(r.Driver.nationality)}
                     label={r.Driver.nationality}
-                    size="sm"
+                    size="md"
                   />
                   {r.Driver.givenName} {r.Driver.familyName}
                 </Link>

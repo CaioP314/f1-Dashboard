@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getRaceResults } from "@/lib/api";
+import { getRaceResults, getRaceSchedule } from "@/lib/api";
 import { formatDateLong } from "@/lib/format";
 import { countryCode } from "@/lib/flags";
 import NumBadge from "@/components/NumBadge";
@@ -9,11 +9,69 @@ import ResultsTable from "@/components/ResultsTable";
 
 export const revalidate = 1800;
 
+const sessionLabels = {
+  FirstPractice: "Treino livre 1",
+  SecondPractice: "Treino livre 2",
+  ThirdPractice: "Treino livre 3",
+  Sprint: "Sprint",
+  Qualifying: "Classificação",
+  Race: "Corrida",
+};
+
+function formatSessionDate(session) {
+  if (!session?.date) return "Data a confirmar";
+
+  const parts = new Intl.DateTimeFormat("pt-BR", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+    timeZone: "UTC",
+  }).formatToParts(new Date(`${session.date}T00:00:00Z`));
+  const values = Object.fromEntries(parts.map(({ type, value }) => [type, value]));
+
+  return `${values.day} ${values.month} ${values.year}`;
+}
+
+function formatSessionTime(session) {
+  if (!session?.date || !session?.time) return "Horário a confirmar";
+
+  return new Intl.DateTimeFormat("pt-BR", {
+    hour: "2-digit",
+    minute: "2-digit",
+    timeZone: "America/Sao_Paulo",
+  }).format(new Date(`${session.date}T${session.time}`));
+}
+
+function getSessions(race) {
+  return [
+    "FirstPractice",
+    "SecondPractice",
+    "ThirdPractice",
+    "Sprint",
+    "Qualifying",
+  ]
+    .filter((sessionName) => race[sessionName])
+    .map((sessionName) => ({
+      name: sessionLabels[sessionName],
+      session: race[sessionName],
+    }))
+    .concat({
+      name: sessionLabels.Race,
+      session: { date: race.date, time: race.time },
+    });
+}
+
 export default async function RaceDetailPage({ params }) {
   const { season, round } = await params;
-  const race = await getRaceResults(season, round);
+  const [resultsRace, scheduleRace] = await Promise.all([
+    getRaceResults(season, round),
+    getRaceSchedule(season, round),
+  ]);
+  const race = scheduleRace ?? resultsRace;
 
   if (!race) notFound();
+
+  const results = resultsRace?.Results ?? [];
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-16">
@@ -28,7 +86,7 @@ export default async function RaceDetailPage({ params }) {
             <FlagImage
               code={countryCode(race.Circuit.Location.country)}
               label={race.Circuit.Location.country}
-              size="lg"
+              size="md"
             />
             {race.raceName}
           </h1>
@@ -39,18 +97,40 @@ export default async function RaceDetailPage({ params }) {
         </div>
       </div>
 
-      <section className="mt-10">
-        <h2 className="text-xs font-semibold uppercase tracking-widest text-muted">Resultado</h2>
-        <div className="mt-4">
-          {race.Results?.length > 0 ? (
-            <ResultsTable results={race.Results} />
-          ) : (
-            <p className="text-sm text-muted">
-              Resultado ainda não disponível para esta corrida.
-            </p>
-          )}
-        </div>
-      </section>
+      {results.length > 0 ? (
+        <section className="mt-10">
+          <h2 className="text-xs font-semibold uppercase tracking-widest text-muted">Resultado</h2>
+          <div className="mt-4">
+            <ResultsTable results={results} />
+          </div>
+        </section>
+      ) : (
+        <section className="mt-10">
+          <h2 className="text-xs font-semibold uppercase tracking-widest text-muted">
+            Programação
+          </h2>
+          <div className="mt-4 flex flex-col gap-3">
+            {getSessions(race).map(({ name, session }) => (
+              <div
+                key={name}
+                className="flex items-center justify-between gap-4 border border-line bg-surface p-4"
+              >
+                <div>
+                  <p
+                    className="font-mono text-lg font-black uppercase tracking-tight text-accent sm:text-xl"
+                  >
+                    {name}
+                  </p>
+                  <p className="mt-1 text-base text-muted">{formatSessionDate(session)}</p>
+                </div>
+                <p className="shrink-0 text-right font-mono text-base tabular-nums text-text">
+                  {formatSessionTime(session)}
+                </p>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
     </div>
   );
 }

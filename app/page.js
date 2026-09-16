@@ -26,15 +26,6 @@ export default async function Home() {
   const lastResults = lastRace ? await getRaceResults(lastRace.season, lastRace.round) : null;
   const podium = lastResults?.Results?.slice(0, 3) ?? [];
 
-  if (races.length === 0) {
-    return (
-      <div className="mx-auto flex max-w-6xl flex-1 flex-col items-center justify-center px-4 py-24 text-center">
-        <p className="text-sm text-muted">
-          Não foi possível carregar os dados da Jolpica F1 API agora. Tente novamente em instantes.
-        </p>
-      </div>
-    );
-  }
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-16">
@@ -49,7 +40,7 @@ export default async function Home() {
               <FlagImage
                 code={countryCode(nextRace.Circuit.Location.country)}
                 label={nextRace.Circuit.Location.country}
-                size="lg"
+                size="md"
               />
               {nextRace.raceName}
             </h1>
@@ -97,7 +88,7 @@ export default async function Home() {
                 <FlagImage
                   code={countryCode(race.Circuit.Location.country)}
                   label={race.Circuit.Location.country}
-                  size="sm"
+                  size="md"
                   className={isDone ? "opacity-40" : ""}
                 />
               </Link>
@@ -129,7 +120,7 @@ export default async function Home() {
               >
                 <NumBadge
                   value={r.position}
-                  size="lg"
+                  size="md"
                   tone={r.position === "1" ? "gold" : r.position === "2" ? "silver" : "bronze"}
                 />
                 <div className="min-w-0">
@@ -137,7 +128,7 @@ export default async function Home() {
                     <FlagImage
                       code={nationalityCode(r.Driver.nationality)}
                       label={r.Driver.nationality}
-                      size="sm"
+                      size="md"
                     />
                     {r.Driver.givenName} {r.Driver.familyName}
                   </p>
